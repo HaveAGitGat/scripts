@@ -1,0 +1,60 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
+    <title>Show Local Folder File List</title>
+    <script type="text/javascript">
+
+        var fso = new ActiveXObject("Scripting.FileSystemObject");
+        function ShowFolderFileList(folderspec) {
+            var counter = 0;
+            var thisFile = "";
+            var thisLine = "";
+
+            //Returns folder object based on folder path
+            var f = fso.GetFolder(folderspec);
+
+            //Enables enumeration of folder object
+            var fc = new Enumerator(f.files);
+            for (; !fc.atEnd(); fc.moveNext()) {
+                var thisFile = fc.item() + "";
+
+                //Only search through csv files
+                if (thisFile.indexOf("csv") >= 0) {
+                    document.getElementById("files").innerHTML += "<p>" + thisFile + "</p>"
+                    iStream = fso.OpenTextFile(fc.item(), 1, false);
+
+                    //Loop through to end of file
+                    while (!iStream.AtEndOfStream) {
+                        thisLine = iStream.ReadLine();
+
+                        //Specify string to search for
+                        if (thisLine == "searchString") {
+                            counter++;
+                        }
+                    }
+                    iStream.Close();
+                }
+            }
+
+            //Display count of specified string
+            document.getElementById("countWord").value = counter;
+        }
+
+    </script>
+    <script type="text/javascript">
+        function listFiles() {
+            //Specify folder to scan
+            //Syntax for server path: ShowFolderFileList('\\\\base\\All');
+            ShowFolderFileList('C:\\Users\\HaveAGitGat\\Desktop\\Logtest');
+        }
+    </script>
+</head>
+
+<body>
+    <input type='button' onclick='listFiles()' value='List Files' />
+    <div id="files">
+        <textarea id="countWord">  </textarea>
+    </div>
+
+</html>
